@@ -1,0 +1,8 @@
+import re
+
+n = int(input())
+
+for i in range(n):
+    s = input()
+    words = re.findall(r"[A-Za-z]+(?:['-][A-Za-z]+)*", s)
+    print(len(words), *words)
