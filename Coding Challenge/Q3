@@ -1,0 +1,8 @@
+stem = input().strip()
+
+if stem.endswith(("s", "x", "z", "ch", "sh")):
+    print(stem + "es")
+elif len(stem) > 1 and stem.endswith("y") and stem[-2] not in "aeiou":
+    print(stem[:-1] + "ies")
+else:
+    print(stem + "s")
