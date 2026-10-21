@@ -1,0 +1,23 @@
+def stem(word):
+    vowels = "aeiou"
+
+    # Step 1a: plural endings
+    if word.endswith("sses"):
+        word = word[:-2]
+    elif word.endswith("ies"):
+        word = word[:-3] + "i"
+    elif word.endswith("ss"):
+        pass
+    elif word.endswith("s"):
+        word = word[:-1]
+
+    # Implement Step 1b and Step 1c here
+
+    return word
+
+
+q = int(input())
+
+for _ in range(q):
+    word = input().strip()
+    print(stem(word))
