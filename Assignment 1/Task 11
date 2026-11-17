@@ -1,0 +1,76 @@
+language_models = {
+    "Unigram": {
+        "perplexity": 18.4,
+        "speed": "Very fast",
+        "limitation": "Does not use word context"
+    },
+    "Bigram": {
+        "perplexity": 11.7,
+        "speed": "Fast",
+        "limitation": "Uses only one previous word"
+    },
+    "Trigram": {
+        "perplexity": 8.9,
+        "speed": "Medium",
+        "limitation": "Can suffer from data sparsity"
+    },
+    "Backoff": {
+        "perplexity": 9.4,
+        "speed": "Medium",
+        "limitation": "Needs discounting and normalization"
+    }
+}
+taggers = {
+    "Rule-based": {
+        "accuracy": 88,
+        "speed": "Fast",
+        "limitation": "Requires manual rules"
+    },
+    "HMM": {
+        "accuracy": 91,
+        "speed": "Medium",
+        "limitation": "Unknown words are difficult"
+    },
+    "Brill": {
+        "accuracy": 92,
+        "speed": "Medium",
+        "limitation": "Requires annotated training data"
+    }
+}
+print("LANGUAGE MODEL COMPARISON")
+print("-------------------------")
+for name, details in language_models.items():
+    print("\nModel:", name)
+    print("Perplexity:", details["perplexity"])
+    print("Speed:", details["speed"])
+    print("Limitation:", details["limitation"])
+
+print("\nPOS TAGGER COMPARISON")
+print("--------------------")
+for name, details in taggers.items():
+    print("\nTagger:", name)
+    print("Accuracy:", details["accuracy"], "%")
+    print("Speed:", details["speed"])
+    print("Limitation:", details["limitation"])
+best_model = min(
+    language_models,
+    key=lambda name: language_models[name]["perplexity"]
+)
+best_tagger = max(
+    taggers,
+    key=lambda name: taggers[name]["accuracy"]
+)
+print("\nRECOMMENDATION")
+print("--------------")
+print("Best language model:", best_model)
+print("Best POS tagger:", best_tagger)
+print("\nReason:")
+print("The trigram model uses more context and has lower illustrative perplexity.")
+print("The Brill tagger has the highest illustrative tagging accuracy.")
+print("\nDeployment suggestions:")
+print("1. Use a confidence threshold.")
+print("2. Ask callers to repeat unclear station names.")
+print("3. Keep multiple speech-recognition hypotheses.")
+print("4. Collect errors for future training.")
+print("5. Update the vocabulary regularly.")
+print("\nNote: Replace illustrative figures with actual experimental results.")
