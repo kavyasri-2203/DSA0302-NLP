@@ -1,0 +1,243 @@
+import time
+# Grammar without left recursion
+grammar = {
+    "S": [["NP", "VP"]],
+    "NP": [
+        ["Det", "N"],
+        ["Det", "N", "PP"],
+        ["Pronoun"]
+    ],
+    "VP": [
+        ["V"],
+        ["V", "NP"],
+        ["V", "NP", "PP"],
+        ["V", "PP"]
+    ],
+    "PP": [["P", "NP"]],
+    "Det": [["the"], ["a"]],
+    "N": [
+        ["student"], ["students"], ["teacher"],
+        ["form"], ["fee"], ["room"], ["library"],
+        ["exam"], ["hostel"], ["receipt"], ["notice"]
+    ],
+    "V": [
+        ["submit"], ["submits"], ["check"],
+        ["checks"], ["pay"], ["pays"], ["book"],
+        ["books"], ["show"], ["send"]
+    ],
+    "P": [["with"], ["near"], ["for"], ["in"]],
+    "Pronoun": [["I"], ["you"], ["we"], ["they"]]
+}
+
+
+# ------------------------------------------------
+# 1. TOP-DOWN RECURSIVE DESCENT PARSER
+# ------------------------------------------------
+def top_down(symbol, words, pos, steps):
+    steps[0] += 1
+    # Terminal symbol
+    if symbol not in grammar:
+        if pos < len(words) and words[pos] == symbol:
+            return {pos + 1}
+        return set()
+    results = set()
+    for production in grammar[symbol]:
+        positions = {pos}
+        for item in production:
+            new_positions = set()
+            for current in positions:
+                new_positions.update(
+                    top_down(item, words, current, steps)
+                )
+            positions = new_positions
+            if not positions:
+                break
+        results.update(positions)
+    return results
+
+
+# ------------------------------------------------
+# 2. EARLEY PARSER
+# ------------------------------------------------
+def earley(words):
+    n = len(words)
+    chart = [set() for _ in range(n + 1)]
+    # Initial state
+    chart[0].add(("START", ("S",), 0, 0))
+    for i in range(n + 1):
+        changed = True
+        while changed:
+            changed = False
+            for state in list(chart[i]):
+                lhs, rhs, dot, origin = state
+                # COMPLETER
+                if dot == len(rhs):
+                    for old in list(chart[origin]):
+                        a, b, d, o = old
+                        if d < len(b) and b[d] == lhs:
+                            new_state = (a, b, d + 1, o)
+                            if new_state not in chart[i]:
+                                chart[i].add(new_state)
+                                changed = True
+                # PREDICTOR
+                else:
+                    next_symbol = rhs[dot]
+                    if next_symbol in grammar:
+                        for production in grammar[next_symbol]:
+                            new_state = (
+                                next_symbol,
+                                tuple(production),
+                                0,
+                                i
+                            )
+                            if new_state not in chart[i]:
+                                chart[i].add(new_state)
+                                changed = True
+        # SCANNER
+        if i < n:
+            for state in list(chart[i]):
+                lhs, rhs, dot, origin = state
+                if dot < len(rhs) and rhs[dot] == words[i]:
+                    chart[i + 1].add(
+                        (lhs, rhs, dot + 1, origin)
+                    )
+    accepted = (
+        ("START", ("S",), 1, 0) in chart[n]
+    )
+    total_states = sum(len(column) for column in chart)
+    return accepted, total_states
+
+
+# ------------------------------------------------
+# 3. SIMPLIFIED PCFG-STYLE LEXICAL SCORING
+# ------------------------------------------------
+def pcfg_score(sentence):
+    words = sentence.split()
+    score = 1.0
+    determiner = ["the", "a"]
+    nouns = [
+        "student", "students", "teacher", "form",
+        "fee", "room", "library", "exam", "hostel",
+        "receipt", "notice"
+    ]
+    verbs = [
+        "submit", "submits", "check", "checks",
+        "pay", "pays", "book", "books", "show", "send"
+    ]
+    prepositions = ["with", "near", "for", "in"]
+    pronouns = ["I", "you", "we", "they"]
+    for word in words:
+        if word in determiner:
+            score *= 0.5
+        elif word in nouns:
+            score *= 0.
+        elif word in verbs:
+            score *= 0.1
+        elif word in prepositions:
+            score *= 0.2
+        elif word in pronouns:
+            score *= 0.5
+        else:
+            return 0.0
+    return score
+
+# ------------------------------------------------
+# 4. THIRTY TEST SENTENCES
+# ------------------------------------------------
+sentences = [
+    "the student submits the form",
+    "the students submit the form",
+    "the teacher checks the exam",
+    "the student pays the fee",
+    "the student books the room",
+    "the student shows the notice",
+    "the student sends the receipt",
+    "the student submits a form",
+    "the teacher checks the timetable",
+    "the student pays the fee",
+    "the student books the hostel",
+    "the students check the exam",
+    "the student submits the receipt",
+    "the teacher pays the fee",
+    "the students book the room",
+    "the student checks the library",
+    "the student shows the form",
+    "the teacher submits the notice",
+    "the student submits the form with the notice",
+    "the student books the room near the library",
+    "the teacher checks the exam in the room",
+    "the student submits the fee for the hostel",
+    "the students submit the form with the receipt",
+    "the student checks the notice near the library",
+    "the student submit the form",
+    "the students submits the form",
+    "the student pays",
+    "the portal crashed the form",
+    "the student submits the form near the library",
+    "the teacher checks the fee with the notice"
+]
+
+# ------------------------------------------------
+# 5. TEST AND COMPARE ALL PARSERS
+# ------------------------------------------------
+print("TASK 10: IMPLEMENT AND TEST PARSERS")
+print("=" * 75)
+top_accepted = 0
+earley_accepted = 0
+pcfg_positive = 0
+for index, sentence in enumerate(sentences, 1):
+    words = sentence.split()
+    # TOP-DOWN PARSER
+    steps = [0]
+    start = time.perf_counter()
+    top_results = top_down("S", words, 0, steps)
+    top_time = time.perf_counter() - start
+    top_ok = len(words) in top_results
+    # EARLEY PARSER
+    start = time.perf_counter()
+    earley_ok, chart_states = earley(words)
+    earley_time = time.perf_counter() - start
+    # PCFG-STYLE SCORE
+    start = time.perf_counter()
+    score = pcfg_score(sentence)
+    pcfg_time = time.perf_counter() - start
+    if top_ok:
+        top_accepted += 1
+    if earley_ok:
+        earley_accepted += 1
+    if score > 0:
+        pcfg_positive += 1
+    print("\nTest", index, ":", sentence)
+    print(
+        "Top-down:",
+        "Accepted" if top_ok else "Rejected",
+        "| Steps:", steps[0],
+        "| Time:", round(top_time, 6), "seconds"
+    )
+    print(
+        "Earley:",
+        "Accepted" if earley_ok else "Rejected",
+        "| States:", chart_states,
+        "| Time:", round(earley_time, 6), "seconds"
+    )
+    print(
+        "PCFG-style lexical score:",
+        round(score, 8),
+        "| Time:", round(pcfg_time, 6), "seconds"
+    )
+
+# ------------------------------------------------
+# 6. FINAL SUMMARY
+# ------------------------------------------------
+print("\n")
+print("=" * 75)
+print("FINAL SUMMARY")
+print("=" * 75)
+print("Total test sentences:", len(sentences))
+print("Top-down accepted:", top_accepted)
+print("Earley accepted:", earley_accepted)
+print("PCFG positive lexical scores:", pcfg_positive)
+print("\nNOTE:")
+print("The PCFG section demonstrates simplified lexical scoring.")
+print("It does not calculate complete parse-tree probabilities.")
+print("The grammar does not enforce subject-verb agreement.")
