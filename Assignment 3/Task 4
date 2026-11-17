@@ -1,0 +1,53 @@
+tests = [
+    ("The student submits the form", True),
+    ("The students submit the form", True),
+    ("The teacher checks the timetable", True),
+    ("The teachers check the timetable", True),
+    ("The student pays the fee", True),
+    ("The students pay the fee", True),
+    ("The students submits the form", False),
+    ("The student submit the form", False),
+    ("The teachers checks the form", False),
+    ("The student pay the fee", False),
+    ("The students pays the fee", False),
+    ("The teacher check the timetable", False)
+]
+singular_nouns = ["student", "teacher"]
+plural_nouns = ["students", "teachers"]
+singular_verbs = ["submits", "checks", "pays"]
+plural_verbs = ["submit", "check", "pay"]
+def check_agreement(sentence):
+    words = sentence.lower().split()
+    if len(words) < 3:
+        return False
+    noun = words[1]
+    verb = words[2]
+    if noun in singular_nouns and verb in singular_verbs:
+        return True
+    if noun in plural_nouns and verb in plural_verbs:
+        return True
+    return False
+print("AGREEMENT TEST RESULTS")
+print("-" * 65)
+correct = 0
+for sentence, expected in tests:
+    result = check_agreement(sentence)
+    status = "Accepted" if result else "Rejected"
+    if result == expected:
+        correct += 1
+    print(sentence)
+    print("Expected:", expected, "| Result:", status)
+    print()
+print("Correct classifications:", correct, "/", len(tests))
+# Rule explosion calculation
+persons = 3
+numbers = 2
+genders = 3
+cases = 4
+combinations = persons * numbers * genders * cases
+print("\nFEATURE COMBINATIONS")
+print("Person:", persons)
+print("Number:", numbers)
+print("Gender:", genders)
+print("Case:", cases)
+print("Total combinations:", combinations)
