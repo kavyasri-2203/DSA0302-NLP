@@ -1,0 +1,73 @@
+from collections import Counter, defaultdict
+
+training_data = [
+    [("book", "VB"), ("two", "CD"), ("tickets", "NNS")],
+    [("I", "PRP"), ("need", "VBP"), ("a", "DT"), ("ticket", "NN")],
+    [("the", "DT"), ("bus", "NN"), ("leaves", "VBZ")],
+    [("please", "UH"), ("book", "VB"), ("one", "CD"), ("ticket", "NN")],
+    [("return", "VB"), ("to", "TO"), ("Chennai", "NNP")]
+]
+word_tag_counts = defaultdict(Counter)
+for sentence in training_data:
+    for word, tag in sentence:
+        word_tag_counts[word.lower()][tag] += 1
+def initial_tagger(words):
+    tags = []
+
+    for word in words:
+        if word.lower() in word_tag_counts:
+            tag = word_tag_counts[word.lower()].most_common(1)[0][0]
+        else:
+            tag = "NN"
+        tags.append(tag)
+    return tags
+def learn_rules(words, correct_tags):
+    predicted_tags = initial_tagger(words)
+    learned_rules = []
+    # Example transformation templates
+    templates = [
+        ("book", "NN", "VB"),
+        ("return", "VB", "NN"),
+        ("suffix_ing", "NN", "VBG"),
+        ("capitalized", "NN", "NNP")
+    ]
+    for template, old_tag, new_tag in templates:
+        corrected = 0
+        introduced = 0
+        for i, word in enumerate(words):
+            condition = False
+            if template == "book" and word.lower() == "book":
+                condition = True
+            elif template == "return" and word.lower() == "return":
+                condition = True
+            elif template == "suffix_ing" and word.lower().endswith("ing"):
+                condition = True
+            elif template == "capitalized" and word.istitle():
+                condition = True
+            if condition and predicted_tags[i] == old_tag:
+                if correct_tags[i] == new_tag:
+                    corrected += 1
+                else:
+                    introduced += 1
+                predicted_tags[i] = new_tag
+        if corrected > 0:
+            learned_rules.append(
+                (template, old_tag, new_tag, corrected, introduced)
+            )
+    return predicted_tags, learned_rule
+words = ["I", "need", "a", "return", "ticket", "to", "Chennai"]
+correct_tags = ["PRP", "VBP", "DT", "NN", "NN", "TO", "NNP"]
+initial = initial_tagger(words)
+final_tags, rules = learn_rules(words, correct_tags)
+print("Input words:", words)
+print("\nInitial tags:", initial)
+print("Final tags:", final_tags)
+print("\nLearned transformation rules:")
+for rule in rules:
+    print("Template:", rule[0])
+    print("Old tag:", rule[1])
+    print("New tag:", rule[2])
+    print("Errors corrected:", rule[3])
+    print("Errors introduced:", rule[4])
+    print(
+print("Brill tagging learns rule
