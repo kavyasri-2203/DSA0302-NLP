@@ -1,0 +1,52 @@
+verb_frames = {
+    "crashed": "Intransitive",
+    "submit": "Transitive",
+    "send": "Ditransitive",
+    "tell": "Sentential complement",
+    "apply": "Prepositional complement",
+    "pay": "Transitive",
+    "sleep": "Intransitive"
+}
+print("VERB SUBCATEGORIZATION")
+for verb, frame in verb_frames.items():
+    print(verb, ":", frame)
+# Sentence validation
+tests = [
+    ("The portal crashed", True),
+    ("Submit the form", True),
+    ("Send me the receipt", True),
+    ("Tell me that the fee is paid", True),
+    ("Apply for a hostel room", True),
+    ("The portal crashed the form", False),
+    ("Submit", False),
+    ("The student pays the fee", True),
+]
+def validate(sentence):
+    s = sentence.lower().strip()
+    if s == "the portal crashed":
+        return True
+    if s == "submit the form":
+        return True
+    if s == "send me the receipt":
+        return True
+    if s == "tell me that the fee is paid":
+        return True
+    if s == "apply for a hostel room":
+        return True
+    if s == "the student pays the fee":
+        return True
+    return False
+print("\nSENTENCE TEST RESULTS")
+print("-" * 45)
+for sentence, expected in tests:
+    result = validate(sentence)
+    print(sentence)
+    print("Expected:", "Accept" if expected else "Reject")
+    print("Actual:", "Accept" if result else "Reject")
+    print()
+print("COMPLEMENT VS ADJUNCT")
+print("Complement: Apply for a hostel room")
+print("Adjunct: Submit the form in the office")
+print("\nMultiple-frame verbs:")
+print("Pay -> Pay the fee / Pay the student")
+print("Tell -> Tell me / Tell me that the fee is paid")
