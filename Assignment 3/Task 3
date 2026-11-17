@@ -1,0 +1,65 @@
+sentence_types = {
+    "Declarative": [
+        "The student submits the form",
+        "The teacher checks the timetable"
+    ],
+    "Imperative": [
+        "Submit the form",
+        "Check the examination timetable"
+    ],
+    "Yes/No Question": [
+        "Does the student submit the form",
+        "Can you book the room"
+    ],
+    "WH Question": [
+        "What is the examination date",
+        "Where is the library"
+    ],
+    "Subject WH Question": [
+        "Who submitted the form",
+        "Which student paid the fee"
+    ],
+    "Subordinate Clause": [
+        "The student knows that the exam is postponed"
+    ],
+    "Relative Clause": [
+        "The exams that were postponed will be held tomorrow"
+    ]
+}
+grammar = [
+    "S -> DECL",
+    "S -> IMP",
+    "S -> YESNO",
+    "S -> WH",
+    "DECL -> NP VP",
+    "IMP -> V NP",
+    "YESNO -> AUX NP VP",
+    "WH -> WHWORD AUX NP VP",
+    "WH -> WHWORD VP",
+    "NP -> DET N",
+    "NP -> NP RELCLAUSE",
+    "VP -> V NP",
+    "VP -> V S",
+    "VP -> AUX V",
+    "RELCLAUSE -> REL NP VP",
+    "S -> S CONJ S"
+]
+print("GRAMMAR RULES")
+for rule in grammar:
+    print(rule)
+print("\nSENTENCE CONSTRUCTIONS")
+for category, sentences in sentence_types.items():
+    print("\n" + category)
+    for sentence in sentences:
+        print("  ", sentence)
+print("\nSTRUCTURAL DIFFERENCES")
+print("Declarative: NP + VP")
+print("Imperative: Verb + NP")
+print("Yes/No: Auxiliary + NP + VP")
+print("WH: WH-word + auxiliary + NP + VP")
+print("Relative: NP + Relative Clause")
+print("Subordinate: Main Clause + Embedded Clause")
+print("\nCoordination example:")
+print("The student paid fees and hostel charges.")
+print("\nLong-distance dependency example:")
+print("What did the student say that the teacher checked?")
