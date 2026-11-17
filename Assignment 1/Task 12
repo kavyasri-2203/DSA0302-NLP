@@ -1,0 +1,64 @@
+old_vocabulary = {
+    "chennai", "vellore", "bus", "train",
+    "ticket", "timing", "fare", "to",
+    "from", "book", "cancel"
+}
+new_utterances = [
+    "chennai to madurai bus timing",
+    "chennai to tambaram metro timing enna",
+    "book ticket to newstation train",
+    "metro fare from chennai to airport"
+]
+all_new_words = []
+for sentence in new_utterances:
+    all_new_words.extend(sentence.lower().split())
+unknown_words = [
+    word for word in all_new_words
+    if word not in old_vocabulary
+]
+oov_rate = (
+    100 * len(unknown_words) / len(all_new_words)
+    if all_new_words else 0
+)
+print("NEW DOMAIN ANALYSIS")
+print("-------------------")
+print("Total new tokens:", len(all_new_words))
+print("Unknown tokens:", len(unknown_words))
+print("OOV rate:", round(oov_rate, 2), "%")
+print("\nUnknown words:")
+for word in sorted(set(unknown_words)):
+    print(word)
+print("\nIMPACT ANALYSIS")
+print("---------------")
+print("1. New station names increase vocabulary size.")
+print("2. Code-mixed words are not represented in the original English vocabulary.")
+print("3. Unknown words can cause language-model probability problems.")
+print("4. Unknown station names can reduce tagging accuracy.")
+print("5. Original transition probabilities may not represent metro enquiries.")
+print("\nADAPTATION PLAN")
+print("---------------")
+print("1. Add a station-name gazetteer.")
+print("2. Add metro and intercity train names.")
+print("3. Use character n-grams to handle unseen words.")
+print("4. Add a code-mixed word category to the tagset.")
+print("5. Retrain the language model using new transport data.")
+print("6. Recalculate interpolation and backoff weights.")
+print("7. Add phonetic spelling normalization for speech recognition.")
+print("8. Update the training corpus regularly.")
+print("\nEXAMPLE CODE-MIXED SENTENCE")
+sentence = "Chennai to Madurai bus timing enna"
+words = sentence.split()
+for word in words:
+    lower = word.lower()
+    if lower in old_vocabulary:
+        tag = "KNOWN"
+    elif word.istitle():
+        tag = "PROPER_NOUN"
+    else:
+        tag = "CODE_MIXED_OR_UNKNOWN"
+    print(word, "->", tag)
+print("\nFINAL DECISION")
+print("--------------")
+print("Modify the original system instead of retaining it unchanged.")
+print("Use a larger vocabulary, station gazetteer, character-level model")
+print("and an extended POS tagset.")
