@@ -1,0 +1,72 @@
+student = {
+    "NUM": "singular",
+    "PER": 3,
+    "CASE": "subject"
+}
+students = {
+    "NUM": "plural",
+    "PER": 3,
+    "CASE": "subject"
+}
+verb_singular = {
+    "NUM": "singular",
+    "PER": 3
+}
+verb_plural = {
+    "NUM": "plural",
+    "PER": 3
+}
+pronoun = {
+    "NUM": "singular",
+    "PER": 1,
+    "CASE": "subject"
+}
+def unify(fs1, fs2):
+    result = fs1.copy()
+    for key, value in fs2.items():
+        if key in result and result[key] != value:
+            return None
+        result[key] = value
+    return result
+print("FEATURE STRUCTURES")
+print("Student:", student)
+print("Students:", students)
+print("Singular verb:", verb_singular)
+print("Plural verb:", verb_plural)
+print("Pronoun:", pronoun)
+print("\nUNIFICATION 1")
+result1 = unify(student, verb_singular)
+print(result1)
+print("\nUNIFICATION 2")
+result2 = unify(students, verb_plural)
+print(result2)
+print("\nUNIFICATION 3")
+result3 = unify(student, verb_plural)
+print(result3)
+if result3 is None:
+    print("Unification failed due to number disagreement.")
+print("\nAGREEMENT TEST")
+sentences = [
+    ("Student + singular verb", student, verb_singular),
+    ("Students + plural verb", students, verb_plural),
+    ("Student + plural verb", student, verb_plural)
+]
+for name, fs1, fs2 in sentences:
+    result = unify(fs1, fs2)
+    print(name)
+    if result is None:
+        print("Rejected")
+    else:
+        print("Accepted:", result)
+# Subcategorization features
+verbs = {
+    "crashed": {"SUBCAT": "intransitive"},
+    "submit": {"SUBCAT": "transitive"},
+    "send": {"SUBCAT": "ditransitive"},
+    "tell": {"SUBCAT": "sentential"},
+    "apply": {"SUBCAT": "prepositional"}
+}
+print("\nSUBCATEGORIZATION FEATURES")
+for verb, features in verbs.items():
+    print(verb, features)
+print("\nFeature unification completed.")
