@@ -1,0 +1,77 @@
+grammar = {
+    "S": [["NP", "VP"]],
+    "NP": [["Det", "N"]],
+    "VP": [["V", "NP"], ["V"]],
+    "Det": [["the"], ["a"]],
+    "N": [["student"], ["form"], ["fee"]],
+    "V": [["submits"], ["checks"], ["pays"]]
+}
+def earley_parse(words):
+    n = len(words)
+    chart = [set() for _ in range(n + 1)]
+    # State: (lhs, rhs, dot, origin)
+    chart[0].add(("START", ("S",), 0, 0))
+    for i in range(n + 1):
+        changed = True
+        while changed:
+            changed = False
+            for state in list(chart[i]):
+                lhs, rhs, dot, origin = state
+                # COMPLETER
+                if dot == len(rhs):
+                    for old in list(chart[origin]):
+                        a, b, d, o = old
+                        if d < len(b) and b[d] == lhs:
+                            new_state = (a, b, d + 1, o)
+                            if new_state not in chart[i]:
+                                chart[i].add(new_state)
+                                changed = True
+                else:
+                    next_symbol = rhs[dot]
+                    # PREDICTOR
+                    if next_symbol in grammar:
+                        for production in grammar[next_symbol]:
+                            new_state = (
+                                next_symbol,
+                                tuple(production),
+                                0,
+                                i
+                            )
+                            if new_state not in chart[i]:
+                                chart[i].add(new_state)
+                                changed = True
+        # SCANNER
+        if i < n:
+            for state in list(chart[i]):
+                lhs, rhs, dot, origin = state
+                if dot < len(rhs):
+                    if rhs[dot] == words[i]:
+                        chart[i + 1].add(
+                            (lhs, rhs, dot + 1, origin)
+                        )
+    accepted = (
+        "START", ("S",), 1, 0
+    ) in chart[n]
+    print("\nEARLEY CHART")
+    for i, states in enumerate(chart):
+        print("\nChart S[" + str(i) + "]")
+        for lhs, rhs, dot, origin in sorted(states):
+            production = list(rhs)
+            production.insert(dot, "•")
+            print(
+                lhs, "->", " ".join(production),
+                "[Origin:", origin, "]"
+            )
+    return accepted, chart
+sentence = "the student submits the form"
+words = sentence.split()
+print("Sentence:", sentence)
+accepted, chart = earley_parse(words)
+print("\nRESULT:")
+print("Accepted" if accepted else "Rejected")
+print("\nNumber of chart states:",
+      sum(len(states) for states in chart))
+print("\nEarley operations:")
+print("1. Predictor")
+print("2. Scanner")
+print("3. Completer")
