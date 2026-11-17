@@ -1,0 +1,114 @@
+import math
+from collections import Counter
+training_data = [
+    [("book", "VB"), ("two", "CD"), ("tickets", "NNS"),
+     ("to", "TO"), ("Vellore", "NNP")],
+    [("I", "PRP"), ("need", "VBP"), ("a", "DT"),
+     ("ticket", "NN")],
+    [("the", "DT"), ("bus", "NN"), ("leaves", "VBZ"),
+     ("now", "RB")],
+    [("please", "UH"), ("book", "VB"), ("one", "CD"),
+     ("ticket", "NN")],
+    [("return", "VB"), ("to", "TO"), ("Chennai", "NNP")]
+]
+tags = sorted(set(tag for sentence in training_data for word, tag in sentence))
+
+transition_counts = Counter()
+emission_counts = Counter()
+tag_counts = Counter()
+vocabulary = set()
+for sentence in training_data:
+    previous_tag = "<s>"
+    for word, tag in sentence:
+        transition_counts[(previous_tag, tag)] += 1
+        tag_counts[previous_tag] += 1
+        emission_counts[(tag, word.lower())] += 1
+        vocabulary.add(word.lower())
+        previous_tag = tag
+    transition_counts[(previous_tag, "</s>")] += 1
+    tag_counts[previous_tag] += 1
+def transition_probability(previous, current):
+    return (
+        transition_counts[(previous, current)] + 0.1
+    ) / (
+        tag_counts[previous] + 0.1 * (len(tags) + 1)
+    )
+def emission_probability(tag, word):
+    total = sum(
+        count for (t, w), count in emission_counts.items()
+        if t == tag
+    )
+    return (
+        emission_counts[(tag, word.lower())] + 0.1
+    ) / (
+        total + 0.1 * (len(vocabulary) + 1)
+    )
+def unknown_word_tag(word):
+    if word.istitle():
+        return "NNP"
+    elif word.lower().endswith("ing"):
+        return "VBG"
+    elif word.lower().endswith("ly"):
+        return "RB"
+    else:
+        return "NN"
+def viterbi(words):
+    scores = []
+    backpointers = []
+    # First word
+    first_scores = {}
+    for tag in tags:
+        first_scores[tag] = (
+            math.log(transition_probability("<s>", tag))
+            + math.log(emission_probability(tag, words[0]))
+        )
+    scores.append(first_scores)
+    backpointers.append({tag: None for tag in tags})
+    # Remaining words
+    for i in range(1, len(words)):
+        current_scores = {}
+        current_backpointers = {}
+        for current_tag in tags:
+            best_score = float("-inf")
+            best_previous = None
+            for previous_tag in tags:
+                score = (
+                    scores[i-1][previous_tag]
+                    + math.log(transition_probability(previous_tag, current_tag))
+                    + math.log(emission_probability(current_tag, words[i]))
+                )
+                if score > best_score:
+                    best_score = score
+                    best_previous = previous_tag
+            current_scores[current_tag] = best_score
+            current_backpointers[current_tag] = best_previous
+        scores.append(current_scores)
+        backpointers.append(current_backpointers)
+    # Find final tag
+    last_tag = max(tags, key=lambda t: scores[-1][t])
+    # Recover best sequence
+    best_sequence = [last_tag]
+    for i in range(len(words)-1, 0, -1):
+        last_tag = backpointers[i][last_tag]
+        best_sequence.append(last_tag)
+    best_sequence.reverse()
+    return best_sequence, scores
+words = ["please", "book", "two", "tickets", "to", "Vellore"]
+best_tags, trellis = viterbi(words)
+print("Input sentence:")
+print(" ".join(words))
+print("\nBest POS tag sequence:")
+for word, tag in zip(words, best_tags):
+    print(word, "->", tag)
+print("\nViterbi trellis (log scores):")
+for i, word in enumerate(words):
+    print("\nWord:", word)
+    for tag in tags:
+        print(tag, ":", round(trellis[i][tag], 4))
+print("\nUnknown word handling:")
+for word in ["Madurai", "running", "quickly", "unknown"]:
+    print(word, "->", unknown_word_tag(word))
+print("\nComplexity:")
+print("Viterbi: O(T * K^2)")
+print("Exhaustive search: O(K^T)")
+print("Greedy tagging: approximately O(T * K)")
