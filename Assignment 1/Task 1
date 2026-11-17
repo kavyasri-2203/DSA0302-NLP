@@ -1,0 +1,41 @@
+import re
+from collections import Counter
+sentences = [
+    "Book two tickets to Vellore at 6:30",
+    "I need a return ticket to Chennai",
+    "Bus from Chennai to Vellore",
+    "What is the fare to Vellore",
+    "Train timing please",
+    "Cancel my ticket and refund fare",
+    "The bus leaves at 6:30",
+    "Book one ticket from Vellore"
+]
+def tokenize(sentence):
+    return re.findall(r"[a-zA-Z]+|\d+:\d+|\d+", sentence.lower())
+tokens = []
+for sentence in sentences:
+    tokens.extend(tokenize(sentence))
+word_counts = Counter(tokens)
+print("Total tokens:", len(tokens))
+print("Total types:", len(word_counts))
+print("Word frequencies:")
+for word, count in word_counts.most_common():
+    print(word, ":", count)
+print("\nVocabulary and UNK threshold:")
+for threshold in [1, 2, 3, 5]:
+    vocab = [w for w, c in word_counts.items() if c >= threshold]
+    unknown = sum(c for w, c in word_counts.items() if c < threshold)
+    percentage = 100 * unknown / len(tokens)
+    print("Threshold:", threshold)
+    print("Vocabulary size:", len(vocab))
+    print("Tokens mapped to UNK:", round(percentage, 2), "%")
+print("\nZipf rank-frequency:")
+for rank, (word, count) in enumerate(word_counts.most_common(), 1):
+    print("Rank:", rank, "Word:", word, "Frequency:", count)
+print("\nZipf's law: word frequency is approximately inversely proportional to rank.")
+train_size = int(0.8 * len(tokens))
+train_vocab = set(tokens[:train_size])
+dev_tokens = tokens[train_size:]
+oov = sum(1 for word in dev_tokens if word not in train_vocab)
+oov_rate = 100 * oov / len(dev_tokens) if dev_tokens else 0
+print("Development OOV rate:", round(oov_rate, 2), "%")
