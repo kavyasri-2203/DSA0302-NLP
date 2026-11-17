@@ -1,0 +1,58 @@
+grammar = {
+    "S": ["NP VP", "IMP", "YESNO", "WH"],
+    "NP": ["Det N", "Pronoun", "NP PP", "NP AdjP"],
+    "VP": ["V", "V NP", "V NP PP", "V PP", "Aux VP"],
+    "PP": ["P NP"],
+    "AdjP": ["Adj", "Adj AdjP"],
+    "CoordNP": ["NP Conj NP"],
+    "CoordVP": ["VP Conj VP"],
+    "IMP": ["V NP"],
+    "YESNO": ["Aux NP VP"],
+    "WH": ["Wh Aux NP VP"],
+    "Det": ["the", "a", "an", "this", "that"],
+    "N": ["student", "teacher", "exam", "fee", "hostel",
+          "room", "library", "book", "timetable", "receipt",
+          "notice", "course", "class", "placement", "result",
+          "scholarship", "department", "office", "form", "portal"],
+    "V": ["submit", "check", "show", "book", "pay", "send",
+          "tell", "apply", "need", "find", "print", "cancel"],
+    "P": ["in", "on", "near", "for", "to", "from", "with"],
+    "Adj": ["late", "new", "old", "available", "paid",
+            "postponed", "important"],
+    "Pronoun": ["I", "you", "we", "they", "he", "she"],
+    "Aux": ["do", "does", "is", "are", "can", "will"],
+    "Wh": ["what", "where", "when", "who", "which", "why"],
+    "Conj": ["and", "or", "but"]
+}
+print("CONTEXT FREE GRAMMAR")
+print("=" * 45)
+for lhs, productions in grammar.items():
+    print(lhs, "->", " | ".join(productions))
+print("\nNumber of non-terminals:", len(grammar))
+rules = sum(len(v) for v in grammar.values())
+print("Number of production alternatives:", rules)
+# Helpdesk lexicon
+lexicon = {
+    "Noun": ["student", "teacher", "exam", "fee", "hostel",
+             "room", "library", "book", "timetable", "receipt",
+             "notice", "course", "class", "placement", "result",
+             "scholarship", "department", "office", "form",
+             "portal"],
+    "Verb": ["submit", "check", "show", "book", "pay", "send",
+             "tell", "apply", "need", "find", "print", "cancel"],
+    "Adjective": ["late", "new", "old", "available", "paid",
+                  "postponed", "important"],
+    "Preposition": ["in", "on", "near", "for", "to", "from",
+                    "with"],
+    "Pronoun": ["I", "you", "we", "they", "he", "she"],
+    "Determiner": ["the", "a", "an", "this", "that"],
+    "Conjunction": ["and", "or", "but"]
+}
+print("\nLEXICON")
+print("=" * 45)
+total = 0
+for category, words in lexicon.items():
+    print(category, ":", ", ".join(words))
+    total += len(words)
+print("\nTotal lexical entries:", total)
+print("\nCFG successfully created.")
