@@ -1,0 +1,72 @@
+from collections import Counter
+import math
+sentences = [
+    ["<s>", "book", "two", "tickets", "to", "vellore", "</s>"],
+    ["<s>", "book", "one", "ticket", "to", "chennai", "</s>"],
+    ["<s>", "bus", "from", "chennai", "to", "vellore", "</s>"],
+    ["<s>", "what", "is", "the", "fare", "to", "vellore", "</s>"],
+    ["<s>", "train", "timing", "please", "</s>"]
+]
+unigrams = Counter()
+bigrams = Counter()
+trigrams = Counter()
+for sentence in sentences:
+    unigrams.update(sentence[1:])
+    bigrams.update(zip(sentence[:-1], sentence[1:]))
+    trigrams.update(zip(sentence[:-2], sentence[1:-1], sentence[2:]))
+bigram_context = Counter()
+trigram_context = Counter()
+for (a, b), count in bigrams.items():
+    bigram_context[a] += count
+for (a, b, c), count in trigrams.items():
+    trigram_context[(a, b)] += count
+V = len(unigrams)
+N = sum(unigrams.values())
+def p1(word):
+    return (unigrams[word] + 0.1) / (N + 0.1 * V)
+def p2(a, word):
+    return (bigrams[(a, word)] + 0.1) / (bigram_context[a] + 0.1 * V)
+def p3(a, b, word):
+    return (trigrams[(a, b, word)] + 0.1) / (
+        trigram_context[(a, b)] + 0.1 * V
+    )
+# Linear interpolation weights
+lambda1 = 0.2
+lambda2 = 0.3
+lambda3 = 0.5
+def interpolation(a, b, word):
+    return (
+        lambda1 * p1(word)
+        + lambda2 * p2(b, word)
+        + lambda3 * p3(a, b, word)
+    )
+def backoff(a, b, word):
+    if trigrams[(a, b, word)] > 0:
+        return p3(a, b, word)
+    elif bigrams[(b, word)] > 0:
+        return p2(b, word)
+    else:
+        return p1(word)
+def stupid_backoff(a, b, word):
+    if trigrams[(a, b, word)] > 0:
+        return trigrams[(a, b, word)] / trigram_context[(a, b)]
+    elif bigrams[(b, word)] > 0:
+        return 0.4 * p2(b, word)
+    else:
+        return 0.4 * 0.4 * p1(word)
+test = ["<s>", "please", "book", "two", "tickets", "</s>"]
+print("Interpolation weights:")
+print(lambda1, lambda2, lambda3)
+print("Sum of weights:", lambda1 + lambda2 + lambda3)
+print("\nSentence scores:")
+for i in range(2, len(test)):
+    a = test[i-2]
+    b = test[i-1]
+    word = test[i]
+    print("Trigram:", a, b, word)
+    print("Interpolation:", interpolation(a, b, word))
+    print("Backoff:", backoff(a, b, word))
+    print("Stupid backoff score:", stupid_backoff(a, b, word))
+print("\nBackoff uses shorter context when longer context is missing.")
+print("Interpolation combines unigram, bigram and trigram probabilities.")
+print("Stupid backoff produces a score, not a normalized probability.")
