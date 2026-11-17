@@ -1,0 +1,57 @@
+parsers = {
+    "Top-Down": {
+        "Coverage": "Limited by grammar",
+        "Ambiguity": "Backtracking",
+        "Cost": "Can repeat computations",
+        "Maintenance": "Simple grammar"
+    },
+    "Earley": {
+        "Coverage": "CFG grammar coverage",
+        "Ambiguity": "Handles multiple parses",
+        "Cost": "O(n^3) worst case",
+        "Maintenance": "Flexible"
+    },
+    "PCFG": {
+        "Coverage": "Probabilistic grammar coverage",
+        "Ambiguity": "Ranks alternative parses",
+        "Cost": "Depends on parsing algorithm",
+        "Maintenance": "Requires annotated data"
+    }
+}
+print("PARSER COMPARISON")
+print("=" * 65)
+
+for name, details in parsers.items():
+    print("\nParser:", name)
+    for feature, value in details.items():
+        print(feature + ":", value)
+print("\nRECOMMENDATION")
+print("Recommended system:")
+print("Feature-based CFG + Earley Parser + PCFG Ranking")
+print("\nREASONS")
+reasons = [
+    "Feature structures help enforce agreement.",
+    "Subcategorization controls verb complements.",
+    "Earley handles left recursion and ambiguity.",
+    "PCFG ranks multiple valid parse trees.",
+    "The combined approach is suitable for university queries."
+]
+for reason in reasons:
+    print("-", reason)
+print("\nLIMITATIONS")
+limitations = [
+    "Manual grammar development requires effort.",
+    "Probabilities require annotated training data.",
+    "Unseen constructions may not be recognized.",
+    "Ambiguous sentences may still have multiple parses."
+]
+for limitation in limitations:
+    print("-", limitation)
+print("\nMANUAL EFFORT ESTIMATE")
+grammar_rules = 40
+lexicon_words = 60
+annotated_sentences = 20
+print("Grammar rules:", grammar_rules)
+print("Lexicon words:", lexicon_words)
+print("Annotated sentences:", annotated_sentences)
+print("\nFinal decision: Use the hybrid parsing approach.")
