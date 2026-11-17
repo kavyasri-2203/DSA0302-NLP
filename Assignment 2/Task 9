@@ -1,0 +1,66 @@
+counts = {
+    "S": {
+        "NP VP": 20
+    },
+    "NP": {
+        "Det N": 12,
+        "Pronoun": 5,
+        "NP PP": 3
+    },
+    "VP": {
+        "V NP": 12,
+        "V": 5,
+        "VP PP": 3
+    },
+    "Det": {
+        "the": 15,
+        "a": 5
+    },
+    "N": {
+        "student": 10,
+        "form": 10
+    },
+    "V": {
+        "submit": 10,
+        "check": 10
+    }
+}
+# Maximum likelihood probability calculation
+probabilities = {}
+for lhs, rules in counts.items():
+    total = sum(rules.values())
+    probabilities[lhs] = {}
+    for rule, count in rules.items():
+        probabilities[lhs][rule] = count / total
+print("PCFG RULE PROBABILITIES")
+print("=" * 45)
+for lhs, rules in probabilities.items():
+    print("\n", lhs)
+    for rule, probability in rules.items():
+        print(
+            lhs, "->", rule,
+            "Probability:", round(probability, 3)
+        )
+# Verify probability sums
+print("\nPROBABILITY SUM CHECK")
+for lhs, rules in probabilities.items():
+    total = sum(rules.values())
+    print(lhs, "=", round(total, 3))
+# Calculate tree probabilities
+# Tree 1: PP attached to NP
+tree1 = 0.8 * 0.6 * 0.7 * 0.3
+# Tree 2: PP attached to VP
+tree2 = 0.8 * 0.6 * 0.3 * 0.7
+print("\nAMBIGUOUS PARSE PROBABILITIES")
+print("Tree 1 probability:", round(tree1, 5))
+print("Tree 2 probability:", round(tree2, 5))
+total_probability = tree1 + tree2
+print("Sentence probability:", round(total_probability, 5))
+if tree1 > tree2:
+    print("Best parse: Tree 1")
+elif tree2 > tree1:
+    print("Best parse: Tree 2")
+else:
+    print("Both parses have equal probability.")
+print("\nVITERBI RESULT")
+print("Viterbi selects the parse with the highest probability.")
