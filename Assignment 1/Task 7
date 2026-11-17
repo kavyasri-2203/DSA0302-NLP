@@ -1,0 +1,92 @@
+from collections import defaultdict, Counter
+training_data = [
+    [("book", "VB"), ("two", "CD"), ("tickets", "NNS"),
+     ("to", "TO"), ("Vellore", "NNP")],
+    [("I", "PRP"), ("need", "VBP"), ("a", "DT"),
+     ("ticket", "NN")],
+    [("return", "VB"), ("the", "DT"), ("ticket", "NN")],
+    [("the", "DT"), ("bus", "NN"), ("leaves", "VBZ"),
+     ("now", "RB")],
+    [("please", "UH"), ("book", "VB"), ("one", "CD"),
+     ("ticket", "NN")]
+]
+dictionary = defaultdict(Counter)
+for sentence in training_data:
+    for word, tag in sentence:
+        dictionary[word.lower()][tag] += 1
+def rule_based_tagger(words):
+    predicted_tags = []
+    for i, word in enumerate(words):
+        previous_tag = predicted_tags[-1] if predicted_tags else ""
+        next_word = words[i + 1].lower() if i + 1 < len(words) else ""
+        # Dictionary-based initial tag
+        if word.lower() in dictionary:
+            tag = dictionary[word.lower()].most_common(1)[0][0]
+        else:
+            tag = "NN"
+        # Rule 1: A word after a determiner is usually a noun
+        if previous_tag == "DT":
+            tag = "NN"
+        # Rule 2: A word after "to" may be a proper noun
+        if previous_tag == "TO" and word.istitle():
+            tag = "NNP"
+        # Rule 3: Words ending in ing
+        if word.lower().endswith("ing"):
+            tag = "VBG"
+        # Rule 4: Words ending in ed
+        if word.lower().endswith("ed"):
+            tag = "VBD"
+        # Rule 5: Words ending in ly
+        if word.lower().endswith("ly"):
+            tag = "RB"
+        # Rule 6: Plural words
+        if word.lower().endswith("s") and len(word) > 2:
+            tag = "NNS"
+        # Rule 7: A word before "to" may be a verb
+        if next_word == "to":
+            tag = "VB"
+        # Rule 8: A word after a personal pronoun may be a verb
+        if previous_tag == "PRP":
+            tag = "VB"
+        # Rule 9: Capitalized words
+        if word.istitle():
+            tag = "NNP"
+        # Rule 10: Numbers
+        if word.isdigit():
+            tag = "CD"
+        # Rule 11: Common words
+        if word.lower() == "please":
+            tag = "UH"
+        # Rule 12: Book
+        if word.lower() == "book":
+            tag = "VB"
+        # Rule 13: Return
+        if word.lower() == "return":
+            tag = "NN"
+        # Rule 14: Is
+        if word.lower() == "is":
+            tag = "VBZ"
+        # Rule 15: And
+        if word.lower() == "and":
+            tag = "CC"
+        predicted_tags.append(tag)
+    return predicted_tags
+test_sentences = [
+    ["Book", "two", "tickets", "to", "Vellore"],
+    ["I", "need", "a", "ticket"],
+    ["The", "bus", "leaves", "now"],
+    ["Please", "book", "one", "ticket"]
+]
+print("Dictionary size:", len(dictionary))
+print("\nDictionary ambiguity:")
+ambiguity = Counter(len(tags) for tags in dictionary.values())
+for number, count in sorted(ambiguity.items()):
+    print(number, "candidate tag(s):", count, "words")
+print("\nPOS tagging results:")
+for sentence in test_sentences:
+    tags = rule_based_tagger(sentence)
+    print("\nSentence:", " ".join(sentence))
+    for word, tag in zip(sentence, tags):
+        print(word, "->", tag)
+print("\nTotal disambiguation rules: 15")
+print("Evaluate accuracy using a separately hand-tagged test set.")
