@@ -1,0 +1,72 @@
+from collections import Counter
+import random
+random.seed(10)
+sentences = [
+    ["<s>", "book", "two", "tickets", "to", "vellore", "</s>"],
+    ["<s>", "book", "one", "ticket", "to", "chennai", "</s>"],
+    ["<s>", "bus", "from", "chennai", "to", "vellore", "</s>"],
+    ["<s>", "what", "is", "the", "fare", "to", "vellore", "</s>"],
+    ["<s>", "train", "timing", "please", "</s>"]
+]
+unigrams = Counter()
+bigrams = Counter()
+trigrams = Counter()
+for sentence in sentences:
+    unigrams.update(sentence[1:])
+    bigrams.update(zip(sentence[:-1], sentence[1:]))
+    trigrams.update(zip(sentence[:-2], sentence[1:-1], sentence[2:]))
+bigram_context = Counter()
+trigram_context = Counter()
+for (a, b), count in bigrams.items():
+    bigram_context[a] += count
+for (a, b, c), count in trigrams.items():
+    trigram_context[(a, b)] += count
+def unigram_probability(word):
+    return unigrams[word] / sum(unigrams.values())
+def bigram_probability(a, b):
+    if bigram_context[a] == 0:
+        return 0
+    return bigrams[(a, b)] / bigram_context[a]
+def trigram_probability(a, b, c):
+    if trigram_context[(a, b)] == 0:
+        return 0
+    return trigrams[(a, b, c)] / trigram_context[(a, b)]
+test_sentences = [
+    ["<s>", "book", "two", "tickets", "to", "vellore", "</s>"],
+    ["<s>", "bus", "from", "chennai", "to", "vellore", "</s>"],
+    ["<s>", "please", "book", "a", "ticket", "</s>"]
+]
+for sentence in test_sentences:
+    print("\nSentence:", " ".join(sentence))
+    p_uni = 1
+    p_bi = 1
+    p_tri = 1
+    for i in range(1, len(sentence)):
+        p_uni *= unigram_probability(sentence[i])
+        p_bi *= bigram_probability(sentence[i-1], sentence[i])
+        if i >= 2:
+            p_tri *= trigram_probability(
+                sentence[i-2], sentence[i-1], sentence[i]
+            )
+    print("Unigram probability:", p_uni)
+    print("Bigram probability:", p_bi)
+    print("Trigram probability:", p_tri)
+print("\nObserved bigrams:", len(bigrams))
+print("Observed trigrams:", len(trigrams))
+def generate_bigram(max_words=8):
+    current = "<s>"
+    result = []
+    for _ in range(max_words):
+        choices = [b for (a, b) in bigrams if a == current]
+        if not choices:
+            break
+        weights = [bigrams[(current, b)] for b in choices]
+        next_word = random.choices(choices, weights=weights)[0]
+        if next_word == "</s>":
+            break
+        result.append(next_word)
+        current = next_word
+    return " ".join(result)
+print("\nGenerated bigram sentences:")
+for _ in range(10):
+    print(generate_bigram())
