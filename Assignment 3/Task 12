@@ -1,0 +1,126 @@
+original_grammar = {
+    "S": ["NP VP"],
+    "NP": ["Det N"],
+    "VP": ["V NP"],
+    "Det": ["the", "a"],
+    "N": ["student", "exam", "fee", "hostel", "form"],
+    "V": ["submit", "check", "pay"]
+}
+# Extended grammar
+extended_grammar = {
+    "S": [
+        "NP VP",
+        "S CONJ S",
+        "INTJ S",
+        "AUX NP VP",
+        "WH S"
+    ],
+    "NP": [
+        "Det N",
+        "Det N REL VP",
+        "NP PP"
+    ],
+    "VP": [
+        "V NP",
+        "V",
+        "AUX V",
+        "V S",
+        "VP CONJ VP"
+    ],
+    "PP": ["P NP"],
+    "REL": ["that", "which", "who"],
+    "CONJ": ["and", "or", "but"],
+    "INTJ": ["hi", "hello"],
+    "AUX": ["can", "will", "is", "are", "does"],
+    "WH": ["what", "when", "where", "whether"],
+    "Det": ["the", "a", "an"],
+
+    "N": [
+        "student", "students", "exam", "exams",
+        "fee", "hostel", "form", "room",
+        "library", "timetable", "placement"
+    ],
+    "V": [
+        "submit", "check", "pay", "book",
+        "tell", "show", "postponed", "held",
+        "due", "crashed"
+    ],
+    "P": ["in", "on", "near", "for", "with"]
+}
+# Original and new messages
+messages = [
+    "the student submits the form",
+    "the student checks the exam",
+    "hi can you tell me when the exams were postponed",
+    "the hostel fee is due",
+    "can you tell me whether the exam is postponed",
+    "the student pays the fee and books the room",
+    "the exams that were postponed will be held",
+    "hello I need the examination timetable",
+    "the student checks the library",
+    "can you tell me the placement date"
+]
+# Simple word-based coverage test
+known_words = set()
+for category, productions in extended_grammar.items():
+    for production in productions:
+        for word in production.split():
+            if word not in extended_grammar:
+                known_words.add(word)
+def analyse_message(message):
+    words = message.lower().replace(",", "").replace("?", "").split()
+    unknown = []
+    for word in words:
+        if word not in known_words:
+            unknown.append(word)
+    return unknown
+print("TASK 12: DESIGN RE-EVALUATION")
+print("=" * 60)
+print("\nORIGINAL GRAMMAR")
+for category, rules in original_grammar.items():
+    print(category, "->", " | ".join(rules))
+print("\nEXTENDED GRAMMAR")
+for category, rules in extended_grammar.items():
+    print(category, "->", " | ".join(rules))
+
+
+print("\nMESSAGE ANALYSIS")
+print("-" * 60)
+for i, message in enumerate(messages, 1):
+    unknown = analyse_message(message)
+    print("\nMessage", i, ":", message)
+    if unknown:
+        print("Unknown words:", unknown)
+        print("Result: Requires fallback processing")
+    else:
+        print("All words are covered by the lexicon")
+        print("Result: Vocabulary coverage successful")
+# Design decision
+print("\nFINAL DESIGN DECISION")
+print("Decision: MODIFY the original design")
+print("\nIMPROVEMENTS")
+improvements = [
+    "Add rules for embedded questions.",
+    "Add rules for relative clauses.",
+    "Support multiple coordinated clauses.",
+    "Extend the helpdesk vocabulary.",
+    "Use feature structures for agreement.",
+    "Use Earley parsing for ambiguous sentences.",
+    "Use PCFG for ranking possible parses.",
+    "Use partial parsing for incomplete messages.",
+    "Use a fallback mechanism for unknown words."
+]
+for item in improvements:
+    print("-", item)
+print("\nIMPACT ANALYSIS")
+print("Coverage: Increased")
+print("Grammar size: Increased")
+print("Ambiguity: May increase")
+print("Parsing cost: May increase")
+print("Manual annotation effort: Increased")
+print("\nFINAL CONCLUSION")
+print(
+    "A modified feature-based CFG with Earley parsing, "
+    "PCFG ranking and partial-parsing fallback is recommended "
+    "for the university helpdesk."
+)
