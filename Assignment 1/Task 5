@@ -1,0 +1,45 @@
+import math
+from collections import Counter
+def entropy(probabilities):
+    result = 0
+    for p in probabilities:
+        if p > 0:
+            result -= p * math.log2(p)
+    return result
+distributions = {
+    "Uniform": [0.25, 0.25, 0.25, 0.25],
+    "Peaked": [0.9, 0.04, 0.03, 0.03],
+    "Mixed": [0.5, 0.25, 0.15, 0.10]
+}
+print("Entropy calculations:")
+for name, probabilities in distributions.items():
+    print(name, ":", round(entropy(probabilities), 4), "bits")
+sentences = [
+    ["<s>", "book", "two", "tickets", "to", "vellore", "</s>"],
+    ["<s>", "book", "one", "ticket", "to", "chennai", "</s>"],
+    ["<s>", "bus", "from", "chennai", "to", "vellore", "</s>"]
+]
+bigrams = Counter()
+context = Counter()
+vocabulary = set()
+for sentence in sentences:
+    bigrams.update(zip(sentence[:-1], sentence[1:]))
+    vocabulary.update(sentence)
+for (a, b), count in bigrams.items():
+    context[a] += count
+V = len(vocabulary)
+test = ["<s>", "book", "two", "tickets", "to", "vellore", "</s>"]
+for k in [1, 0.1, 0.01]:
+    log_probability = 0
+    for a, b in zip(test[:-1], test[1:]):
+        probability = (bigrams[(a, b)] + k) / (context[a] + k * V)
+        log_probability += math.log(probability)
+    cross_entropy = -log_probability / (len(test) - 1)
+    perplexity = math.exp(cross_entropy)
+    print("\nAdd-k value:", k)
+    print("Cross entropy:", round(cross_entropy, 4))
+    print("Perplexity:", round(perplexity, 4))
+print("\nEntropy measures uncertainty.")
+print("Cross-entropy measures prediction error.")
+print("Perplexity is the exponential of cross-entropy.")
+print("A perplexity of 90 means uncertainty comparable to 90 equally likely choices.")
