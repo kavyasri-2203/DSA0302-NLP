@@ -1,0 +1,49 @@
+import time
+import math
+from collections import Counter
+# Sample training and test data
+train_text = "the cat sat on the mat the cat ate the fish"
+test_text = "the cat sat on the mat"
+# Tokenize
+train_words = train_text.lower().split()
+test_words = test_text.lower().split()
+# Start measuring training time
+start_time = time.time()
+# Build unigram and bigram counts
+unigram_counts = Counter(train_words)
+bigram_counts = Counter(zip(train_words[:-1], train_words[1:]))
+vocabulary = set(train_words)
+vocab_size = len(vocabulary)
+# Stop measuring training time
+training_time = time.time() - start_time
+# Calculate unigram probability
+def unigram_probability(word):
+    return unigram_counts[word] / len(train_words)
+# Calculate Laplace-smoothed bigram probability
+def bigram_probability(w1, w2):
+    count_bigram = bigram_counts[(w1, w2)]
+    count_word = unigram_counts[w1]
+    return (count_bigram + 1) / (count_word + vocab_size)
+# Calculate perplexity
+def calculate_perplexity(words):
+    log_probability = 0.0
+    count = 0
+    for i in range(1, len(words)):
+        probability = bigram_probability(words[i - 1], words[i])
+        log_probability += math.log(probability)
+        count += 1
+    if count == 0:
+        return 0
+    return math.exp(-log_probability / count)
+# Test the model
+perplexity = calculate_perplexity(test_words)
+# Display results
+print("TASK 10: LANGUAGE MODEL TESTING")
+print("--------------------------------")
+print("Training words:", train_words)
+print("Vocabulary size:", vocab_size)
+print("Unigram counts:", dict(unigram_counts))
+print("Bigram counts:", dict(bigram_counts))
+print("Training time:", round(training_time, 6), "seconds")
+print("Test text:", test_text)
+print("Bigram perplexity:", round(perplexity, 4))
