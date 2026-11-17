@@ -1,0 +1,66 @@
+from collections import Counter, defaultdict
+# Domain-specific tagset with 22 tags and Penn Treebank mapping
+tag_mapping = {
+    "NN": "NN",
+    "NNS": "NNS",
+    "NNP": "NNP",
+    "VB": "VB",
+    "VBD": "VBD",
+    "VBG": "VBG",
+    "VBN": "VBN",
+    "VBP": "VBP",
+    "VBZ": "VBZ",
+    "JJ": "JJ",
+    "JJR": "JJR",
+    "RB": "RB",
+    "RBR": "RBR",
+    "PRP": "PRP",
+    "PRP$": "PRP$",
+    "DT": "DT",
+    "IN": "IN",
+    "TO": "TO",
+    "CC": "CC",
+    "MD": "MD",
+    "CD": "CD",
+    "UH": "UH"
+}
+tagged_sentences = [
+    [("book", "VB"), ("two", "CD"), ("tickets", "NNS"),
+     ("to", "TO"), ("Vellore", "NNP")],
+    [("I", "PRP"), ("need", "VBP"), ("a", "DT"),
+     ("return", "NN"), ("ticket", "NN")],
+    [("return", "VB"), ("to", "TO"), ("Chennai", "NNP")],
+    [("the", "DT"), ("bus", "NN"), ("leaves", "VBZ"),
+     ("now", "RB")],
+    [("please", "UH"), ("book", "VB"), ("one", "CD"),
+     ("ticket", "NN")]
+]
+tag_frequency = Counter()
+word_tags = defaultdict(set)
+for sentence in tagged_sentences:
+    for word, tag in sentence:
+        tag_frequency[tag] += 1
+        word_tags[word.lower()].add(tag)
+print("Tagset and Penn Treebank mapping:")
+for tag, penn_tag in tag_mapping.items():
+    print(tag, "->", penn_tag)
+print("\nTag frequency:")
+for tag, count in tag_frequency.items():
+    print(tag, ":", count)
+print("\nAmbiguous words:")
+for word, tags in word_tags.items():
+    if len(tags) > 1:
+        print(word, ":", tags)
+print("\nOpen word classes:")
+print("Nouns, verbs, adjectives and adverbs")
+print("\nClosed word classes:")
+print("Pronouns, determiners, prepositions, conjunctions and auxiliaries")
+print("\nExamples of ambiguous words:")
+print("Book: noun or verb")
+print("Return: noun or verb")
+print("Stand: noun or verb")
+print("Train: noun or verb")
+print("Fast: adjective or adverb")
+print("\nCohen's Kappa formula:")
+print("Kappa = (Observed agreement - Expected agreement)")
+print("/ (1 - Expected agreement)")
