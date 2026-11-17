@@ -1,0 +1,57 @@
+from collections import Counter
+import math
+sentences = [
+    ["<s>", "book", "two", "tickets", "to", "vellore", "</s>"],
+    ["<s>", "book", "one", "ticket", "to", "chennai", "</s>"],
+    ["<s>", "bus", "from", "chennai", "to", "vellore", "</s>"],
+    ["<s>", "what", "is", "the", "fare", "to", "vellore", "</s>"]
+]
+bigrams = Counter()
+context = Counter()
+vocabulary = set()
+for sentence in sentences:
+    bigrams.update(zip(sentence[:-1], sentence[1:]))
+    vocabulary.update(sentence)
+for (a, b), count in bigrams.items():
+    context[a] += count
+V = len(vocabulary)
+def laplace(a, b):
+    return (bigrams[(a, b)] + 1) / (context[a] + V)
+def add_k(a, b, k=0.1):
+    return (bigrams[(a, b)] + k) / (context[a] + k * V)
+print("Vocabulary size:", V)
+print("\nSmoothing results for context 'to':")
+for word in sorted(vocabulary):
+    print(
+        word,
+        "Count:", bigrams[("to", word)],
+        "Laplace:", round(laplace("to", word), 5),
+        "Add-k:", round(add_k("to", word), 5)
+    )
+print("\nUnseen bigram probability:")
+print("Laplace:", laplace("to", "madurai"))
+print("Add-k:", add_k("to", "madurai"))
+frequency_of_frequencies = Counter(bigrams.values())
+print("\nGood-Turing frequency of frequencies:")
+for r in sorted(frequency_of_frequencies):
+    print("N" + str(r), "=", frequency_of_frequencies[r])
+N = sum(bigrams.values())
+N1 = frequency_of_frequencies.get(1, 0)
+print("\nTotal bigram tokens:", N)
+print("Singleton bigrams:", N1)
+print("Estimated unseen probability mass:", N1 / N if N else 0)
+print("\nGood-Turing adjusted counts:")
+for r in sorted(frequency_of_frequencies):
+    nr = frequency_of_frequencies.get(r, 0)
+    nr1 = frequency_of_frequencies.get(r + 1, 0)
+    if nr > 0:
+        adjusted = (r + 1) * nr1 / nr
+        print("Original count:", r, "Adjusted count:", round(adjusted, 4))
+test = ["<s>", "please", "book", "two", "tickets", "</s>"]
+for k in [1, 0.1, 0.01]:
+    log_probability = 0
+    for a, b in zip(test[:-1], test[1:]):
+        probability = add_k(a, b, k)
+        log_probability += math.log(probability)
+    perplexity = math.exp(-log_probability / (len(test) - 1))
+    print("k =", k, "Perplexity =", round(perplexity, 4))
