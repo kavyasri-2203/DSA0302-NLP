@@ -1,0 +1,48 @@
+grammar = {
+    "S": [["NP", "VP"]],
+    "NP": [["Det", "N"]],
+    "VP": [["V", "NP"]],
+    "Det": [["the"]],
+    "N": [["student"], ["form"]],
+    "V": [["submits"]]
+}
+def parse(symbol, words, position, trace):
+    trace.append((symbol, position))
+    if symbol not in grammar:
+        if position < len(words) and words[position] == symbol:
+            return position + 1
+        return None
+    for production in grammar[symbol]:
+        current = position
+        success = True
+        for item in production:
+            result = parse(item, words, current, trace)
+            if result is None:
+                success = False
+                break
+            current = result
+        if success:
+            return current
+    return None
+sentences = [
+    "the student submits the form",
+    "the student submits the student"
+]
+for sentence in sentences:
+    print("\nSentence:", sentence)
+    words = sentence.split()
+    trace = []
+    result = parse("S", words, 0, trace)
+    if result == len(words):
+        print("Accepted")
+    else:
+        print("Rejected")
+    print("Parsing trace:")
+    for symbol, position in trace:
+        print("Symbol:", symbol, "| Position:", position)
+print("\nTOP-DOWN PARSING CHARACTERISTICS")
+print("1. Starts from the start symbol S.")
+print("2. Expands non-terminals.")
+print("3. Matches terminals with input words.")
+print("4. Backtracks when a production fails.")
+print("5. Left recursion can cause infinite recursion.")
