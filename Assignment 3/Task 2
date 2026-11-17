@@ -1,0 +1,78 @@
+grammar = {
+    "S": ["NP VP"],
+    "NP": ["Det N"],
+    "VP": ["V NP"],
+    "Det": ["the", "a"],
+    "N": ["student", "form", "fee", "room"],
+    "V": ["submits", "checks", "pays", "books"]
+}
+# Leftmost derivation
+leftmost = [
+    "S",
+    "NP VP",
+    "Det N VP",
+    "the N VP",
+    "the student VP",
+    "the student V NP",
+    "the student submits NP",
+    "the student submits Det N",
+    "the student submits the N",
+    "the student submits the form"
+]
+# Rightmost derivation
+rightmost = [
+    "S",
+    "NP VP",
+    "NP V NP",
+    "NP V Det N",
+    "NP V Det form",
+    "NP V the form",
+    "NP submits the form",
+    "Det N submits the form",
+    "the N submits the form",
+    "the student submits the form"
+]
+print("LEFTMOST DERIVATION")
+for step in leftmost:
+    print(step)
+print("\nRIGHTMOST DERIVATION")
+for step in rightmost:
+    print(step)
+
+# Parse tree
+tree = """
+                S
+              /   \\
+            NP     VP
+           / \\    /  \\
+         Det  N  V    NP
+          |   |  |    / \\
+         the student submits Det N
+                              |  |
+                             the form
+"""
+print("\nPARSE TREE")
+print(tree)
+# Bracketed representation
+bracketed = (
+    "(S (NP (Det the) (N student)) "
+    "(VP (V submits) (NP (Det the) (N form))))"
+)
+print("BRACKETED TREE:")
+print(bracketed)
+# Tree measurements
+tree_height = 5
+nodes = 11
+rule_applications = 8
+print("\nTREE MEASUREMENTS")
+print("Tree height:", tree_height)
+print("Number of nodes:", nodes)
+print("Rule applications:", rule_applications)
+# Demonstrate PP attachment ambiguity
+print("\nAMBIGUOUS SENTENCE:")
+print("Show the students with the late fee notice")
+print("\nParse 1: PP attached to NP")
+print("(S (VP show (NP (NP students) (PP with late fee notice))))")
+print("\nParse 2: PP attached to VP")
+print("(S (VP (VP show students) (PP with late fee notice)))")
+print("\nTwo different structures demonstrate ambiguity.")
