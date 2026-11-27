@@ -1,0 +1,16 @@
+import nltk
+
+text = "The boy eats an apple"
+grammar = nltk.CFG.fromstring("""
+S -> NP VP
+NP -> DT NN | DT NN
+VP -> VB NP
+DT -> 'The' | 'an'
+NN -> 'boy' | 'apple'
+VB -> 'eats'
+""")
+
+parser = nltk.ChartParser(grammar)
+
+for tree in parser.parse(nltk.word_tokenize(text)):
+    print(tree)
