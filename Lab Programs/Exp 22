@@ -1,0 +1,9 @@
+import re
+
+text = "John is a student. He studies Python."
+name = re.search(r'John', text)
+
+if name:
+    text = re.sub(r'\bHe\b', 'John', text)
+
+print(text)
