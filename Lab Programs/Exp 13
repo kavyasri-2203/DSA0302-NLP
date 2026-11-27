@@ -1,0 +1,13 @@
+import nltk
+
+grammar = nltk.CFG.fromstring("""
+S -> NP VP
+NP -> 'Ram'
+VP -> 'eats' NP
+NP -> 'food'
+""")
+
+parser = nltk.ChartParser(grammar)
+
+for tree in parser.parse(['Ram', 'eats', 'food']):
+    tree.pretty_print()
