@@ -1,0 +1,11 @@
+import nltk
+from nltk.probability import FreqDist, ConditionalFreqDist
+
+data = nltk.corpus.brown.tagged_words()
+cfd = ConditionalFreqDist((w.lower(), t) for w, t in data)
+
+words = ["The", "dog", "runs"]
+
+for w in words:
+    tags = cfd[w.lower()]
+    print(w, max(tags, key=tags.get) if tags else "NN")
