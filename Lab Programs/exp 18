@@ -1,0 +1,11 @@
+import re
+
+expression = "P(x) AND Q(y)"
+
+tokens = re.findall(r'[A-Za-z]+|\(|\)|,', expression)
+print(tokens)
+
+if tokens.count('(') == tokens.count(')'):
+    print("Valid expression")
+else:
+    print("Invalid expression")
