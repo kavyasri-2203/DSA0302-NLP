@@ -1,0 +1,14 @@
+import nltk
+
+grammar = nltk.CFG.fromstring("""
+S -> SG VP1 | PL VP2
+SG -> 'He'
+PL -> 'They'
+VP1 -> 'runs'
+VP2 -> 'run'
+""")
+
+parser = nltk.ChartParser(grammar)
+
+for sentence in [['He', 'runs'], ['They', 'run']]:
+    print(sentence, list(parser.parse(sentence)))
