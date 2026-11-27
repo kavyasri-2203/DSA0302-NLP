@@ -1,0 +1,8 @@
+import random
+from nltk import bigrams, word_tokenize
+
+text = "I love python. I love programming."
+words = word_tokenize(text)
+bg = list(bigrams(words))
+
+print(random.choice(bg))
