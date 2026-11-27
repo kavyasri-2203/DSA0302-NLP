@@ -1,0 +1,12 @@
+import nltk
+
+text = "The cat runs fast"
+tokens = nltk.word_tokenize(text)
+
+tagger = nltk.DefaultTagger('NN')
+tags = tagger.tag(tokens)
+
+rules = {'The': 'DT', 'runs': 'VBZ', 'fast': 'RB'}
+result = [(w, rules.get(w, t)) for w, t in tags]
+
+print(result)
