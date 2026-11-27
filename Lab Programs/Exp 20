@@ -1,0 +1,12 @@
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+
+docs = ["Python is a programming language", "Java is also a programming language", "Cats are animals"]
+
+v = TfidfVectorizer()
+x = v.fit_transform(docs)
+
+query = v.transform(["Python programming"])
+scores = cosine_similarity(query, x)
+
+print(scores)
