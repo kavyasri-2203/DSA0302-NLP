@@ -1,0 +1,10 @@
+import nltk
+from nltk.wsd import lesk
+
+nltk.download('wordnet')
+nltk.download('punkt')
+
+sentence = "I went to the bank to deposit money"
+words = nltk.word_tokenize(sentence)
+
+print(lesk(words, 'bank'))
