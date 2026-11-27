@@ -1,0 +1,15 @@
+import nltk
+
+patterns = [
+    (r'.*ing$', 'VBG'),
+    (r'.*ed$', 'VBD'),
+    (r'.*ly$', 'RB'),
+    (r'.*s$', 'NNS'),
+    (r'.*', 'NN')
+]
+
+text = "The boys are playing happily"
+tokens = nltk.word_tokenize(text)
+
+tagger = nltk.RegexpTagger(patterns)
+print(tagger.tag(tokens))
