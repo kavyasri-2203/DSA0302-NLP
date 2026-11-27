@@ -1,0 +1,7 @@
+import nltk
+from nltk.corpus import wordnet
+
+nltk.download('wordnet')
+
+for syn in wordnet.synsets('book'):
+    print(syn.name(), syn.definition())
