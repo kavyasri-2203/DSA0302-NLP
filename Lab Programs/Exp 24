@@ -1,0 +1,14 @@
+def dialog_act(text):
+    text = text.lower()
+
+    if '?' in text:
+        return "Question"
+    elif any(w in text for w in ['hello', 'hi']):
+        return "Greeting"
+    elif any(w in text for w in ['thanks', 'thank you']):
+        return "Thanking"
+    else:
+        return "Statement"
+
+text = input("Enter dialogue: ")
+print(dialog_act(text))
