@@ -1,0 +1,33 @@
+
+import re
+
+# Sample text
+text = "Python is a programming language. Python is easy to learn."
+
+# 1. Match a pattern at the beginning of the string
+result = re.match("Python", text)
+
+if result:
+    print("Match found:", result.group())
+else:
+    print("No match found")
+
+# 2. Search for a pattern anywhere in the string
+result = re.search("programming", text)
+
+if result:
+    print("Search found:", result.group())
+else:
+    print("Pattern not found")
+
+# 3. Find all occurrences of a pattern
+result = re.findall("Python", text)
+print("All occurrences:", result)
+
+# 4. Replace a pattern in the text
+new_text = re.sub("Python", "Java", text)
+print("After replacement:", new_text)
+
+# 5. Split text using a regular expression
+words = re.split(r"\s", text)
+print("Split words:", words)
